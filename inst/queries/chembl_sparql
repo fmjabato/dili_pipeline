@@ -1,0 +1,66 @@
+# SPARQL query for retrieving data in RDF format stored in ChEMBL endpoint.
+# The query retrieves a set of 'druggable' targets and their ligands.
+
+#      - Target is a direct single target protein (confidence score = 9)
+#      - Target is a human protein
+#      - Target is in UniProtKB/SwissProt database
+#      - Assay type was 'Binding (B)' or 'Functional (F)'
+#      - Assay affinity measured in Ki or IC50 (exactly, =), in nanomolar (nM) units
+#      - Assay affinity was lower or equal than 10^4 nM (10 mM)
+#      - Data validity was not inactive or inconclusive
+
+# Author: Guillermo López García (guilopgar@uma.es)
+
+
+
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX cco: <http://rdf.ebi.ac.uk/terms/chembl#>
+SELECT DISTINCT ?ChEMBL_ID ?ChEMBL_ATC ?ChEMBL_Name ?ChEMBL_Activity_Type ?ChEMBL_Activity_Value ?ChEMBL_Activity_Units ?UniProt_ID
+WHERE {
+ ?activity a cco:Activity ;
+            cco:standardType ?ChEMBL_Activity_Type
+ FILTER (?ChEMBL_Activity_Type IN ("Ki", "IC50"))
+ 
+ ?activity cco:standardRelation ?a_rel
+ FILTER (?a_rel = "=")
+ 
+ ?activity cco:standardUnits ?ChEMBL_Activity_Units 
+ FILTER (?ChEMBL_Activity_Units = "nM")
+ 
+ ?activity cco:standardValue ?ChEMBL_Activity_Value 
+ FILTER (?ChEMBL_Activity_Value <= 10000)
+ 
+ OPTIONAL { ?activity cco:dataValidityComment ?a_valid }
+ 
+ { FILTER (!(BOUND(?a_valid))) } 
+ UNION 
+ { FILTER (?a_valid NOT IN ("Inactive", "Not active", "Inconclusive")) }
+ 
+ ?activity cco:hasMolecule ?m .
+ ?m cco:chemblId ?ChEMBL_ID ;
+    rdfs:label ?ChEMBL_Name ;
+    cco:atcClassification ?ChEMBL_ATC .
+ 
+ ?activity cco:hasAssay ?as .
+ ?as cco:assayType ?as_type 
+ FILTER (?as_type IN ("Binding", "Functional"))
+ 
+ ?as cco:targetConfScore ?as_conf 
+ FILTER (?as_conf = 9)
+ 
+ ?as cco:hasTarget ?t .
+ ?t cco:targetType ?t_raw_type 
+ BIND (UCASE(?t_raw_type) AS ?t_type)
+ FILTER (?t_type = "SINGLE PROTEIN")
+ 
+ ?t cco:organismName ?t_org
+ FILTER regex(?t_org, "homo sapiens", "i")
+ 
+ ?t cco:hasTargetComponent ?t_comp .
+ ?t_comp cco:targetCmptXref ?t_uni .
+ ?t_uni a cco:UniprotRef ;
+        <http://purl.org/dc/elements/1.1/identifier> ?UniProt_ID
+ 
+ }
+           
+ ORDER BY ?ChEMBL_ID ?ChEMBL_Activity_Type ?ChEMBL_Activity_Value ?ChEMBL_ATC ?UniProt_ID
