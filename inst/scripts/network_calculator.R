@@ -1,8 +1,8 @@
 #! /usr/bin/env Rscript
 
-# @author: Fernando Moreno Jabato (jabato<at>uma<dot>es)
-# @author: Guillermo López García (guilopgar@uma.es)
-# @description: Drugs weighted networks calculator
+#' @author: Fernando Moreno Jabato (jabato<at>uma<dot>es)
+#' @author: Guillermo López García (guilopgar@uma.es)
+#' @description: Drugs weighted networks calculator
 
 
 ################################################################################

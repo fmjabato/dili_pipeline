@@ -1,13 +1,8 @@
 #! /usr/bin/env Rscript
 
-# @author: Fernando Moreno Jabato (jabato<at>uma<dot>es)
-# @author: Guillermo López García (guilopgar@uma.es)
-# @description: RDF queries handler.
-
-
-# Load require packages and functions
-# suppressWarnings(suppressPackageStartupMessages(require(optparse)))
-# suppressWarnings(suppressPackageStartupMessages(require(SPARQL)))
+#' @author: Fernando Moreno Jabato (jabato<at>uma<dot>es)
+#' @author: Guillermo López García (guilopgar@uma.es)
+#' @description: RDF queries handler.
 
 
 ################################################################################

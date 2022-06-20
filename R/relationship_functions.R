@@ -1,32 +1,32 @@
-# Given a Drug-Protein and a Protein-Family table, this function creates a 
-# Drug-Family table, in which drugs are associated with the domains of their 
-# single domain protein targets.
-# The process is done by performing a database join operation on the Uniprot ID 
-# column of both tables. This function is an implementation of the "PPDMs 
-# mapping of small molecule bioactivities from ChEMBL to Pfam-A protein 
-# domains", described in Kruger, F.A. et al. (2014).
-# @param chemblTable: A data frame representing the Drug-Protein table, which 
-#         must have one column containing the targets Uniprot IDs.
-# @param colUniprotChembl: A positive integer representing the column of the 
-#         chemblTable that contains the targets Uniprot IDs.
-# @param colChembl: A positive integer or an integer vector representing the 
-#         column/s of the chemblTable to be included in the returned table, 
-#         e.g. the column containing the ChEMBL drugs names.
-# @param pfamTable: A data frame representing the Protein-Family table, which 
-#         must have one column containing the proteins Uniprot IDs.
-# @param colUniprotPfam: A positive integer representing the column of the 
-#         pfamTable that contains the proteins Uniprot IDs.
-# @param colPfam: A positive integer or an integer vector representing the 
-#         column/s of the pfamTable to be included in the returned table, e.g. 
-#         the column containing the Pfam-A families names (recommended column).
-# @param colSort: A positive or an integer vector representing the column/s 
-#         used to optionally sort the returned Drug-Family table. If NULL, no 
-#         sorting is done.
-# @return a dataframe representing the Drug-Family table, containing the 
-#         selected columns from the ChEMBL Drug-Protein table and then the 
-#         selected ones from the Pfam-A Protein-Family table.
-# @author: Guillermo López García (guilopgar@uma.es)
-# @author: Fernando Moreno Jabato (jabato<at>uma<dot>es)
+#' Given a Drug-Protein and a Protein-Family table, this function creates a 
+#' Drug-Family table, in which drugs are associated with the domains of their 
+#' single domain protein targets.
+#' The process is done by performing a database join operation on the Uniprot ID 
+#' column of both tables. This function is an implementation of the "PPDMs 
+#' mapping of small molecule bioactivities from ChEMBL to Pfam-A protein 
+#' domains", described in Kruger, F.A. et al. (2014).
+#' @param chemblTable: A data frame representing the Drug-Protein table, which 
+#'         must have one column containing the targets Uniprot IDs.
+#' @param colUniprotChembl: A positive integer representing the column of the 
+#'         chemblTable that contains the targets Uniprot IDs.
+#' @param colChembl: A positive integer or an integer vector representing the 
+#'         column/s of the chemblTable to be included in the returned table, 
+#'         e.g. the column containing the ChEMBL drugs names.
+#' @param pfamTable: A data frame representing the Protein-Family table, which 
+#'         must have one column containing the proteins Uniprot IDs.
+#' @param colUniprotPfam: A positive integer representing the column of the 
+#'         pfamTable that contains the proteins Uniprot IDs.
+#' @param colPfam: A positive integer or an integer vector representing the 
+#'         column/s of the pfamTable to be included in the returned table, e.g. 
+#'         the column containing the Pfam-A families names (recommended column).
+#' @param colSort: A positive or an integer vector representing the column/s 
+#'         used to optionally sort the returned Drug-Family table. If NULL, no 
+#'         sorting is done.
+#' @return a dataframe representing the Drug-Family table, containing the 
+#'         selected columns from the ChEMBL Drug-Protein table and then the 
+#'         selected ones from the Pfam-A Protein-Family table.
+#' @author: Guillermo López García (guilopgar@uma.es)
+#' @author: Fernando Moreno Jabato (jabato<at>uma<dot>es)
 ppdmsDDomain <- function(chemblTable, pfamTable, colUniprotChembl = 7, 
                          colChembl = 3, colUniprotPfam = 1, colPfam = 2, 
                          colSort = c(1, 2)) {  

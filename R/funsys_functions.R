@@ -8,7 +8,7 @@
 #' @param thr
 #' @param filter_type
 #' @return enrichment performed
-#' @authro Fernando Moreno Jabato <jabato@uma.es>
+#' @author Fernando Moreno Jabato <jabato@uma.es>
 #' @import clusterProfiler enrichGO enrichKEGG
 #' @import org.Hs.eg.db
 #' @import KEGG.db

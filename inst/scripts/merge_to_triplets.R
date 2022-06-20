@@ -1,7 +1,7 @@
 #! /usr/bin/env Rscript
 
-# @author: Fernando Moreno Jabato (jabato<at>uma<dot>es)
-# @description: Combines Chembl and pfam tables to obtains useful triplets table
+#' @author: Fernando Moreno Jabato (jabato<at>uma<dot>es)
+#' @description: Combines Chembl and pfam tables to obtains useful triplets table
 
 ################################################################################
 ## CONFIGURE SCRIPT

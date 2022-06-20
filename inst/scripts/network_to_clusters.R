@@ -1,7 +1,7 @@
 #! /usr/bin/env Rscript
 
-# @author Fernando Moreno Jabato <jabato@uma.com>
-# @description scripts to use input tables to calculate clusters
+#' @author Fernando Moreno Jabato <jabato@uma.com>
+#' @description scripts to use input tables to calculate clusters
 
 ################################################################################
 ## CONFIGURE SCRIPT
