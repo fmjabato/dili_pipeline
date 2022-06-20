@@ -185,3 +185,149 @@ overrepDFamily <- function(chemblTable, pfamTable, colUniprotChembl = 3,
   # Return the Drug-Family table
   return(DFPvalues)
 }
+
+
+
+# Function which takes a pull of same size vectors as a matrix and apply
+# the hypergeometric test to each possible tuple of vectors generating a
+# matrix of vector-vector relationship (kernel)
+# @param vectors: to be compared, stored as matrix
+# @param rows: boolean value that indicates how vectors are stored into 
+#         matrix. If row == TRUE, rows are used as vector, else, columns are 
+#         used as vectors
+# @return a squared symetric matrix with hyI p-value results per all
+#          comparissons or NULL if any error occurs
+# @author Fernando Moreno Jabato <jabato@uma.com>
+hyI_vectors <- function(vectors,rows=T){
+  # Always use rows as vectors
+  if(!rows) vectors <- t(vectors)
+  
+  # Obtain constants values
+  #   N : Total population (combinations)
+  #   n : Sample size (features comparation of two vectors)
+  N <- round(ncol(vectors)*nrow(vectors)*(nrow(vectors)-1)/2)
+  n <- ncol(vectors)
+  
+  # Calculate number of matches per each feature (columns)
+  matches <- unlist(lapply(seq_along(vectors[1,]),function(i){
+    num_hits <- length(which(vectors[,i] == TRUE))
+    mtchs <- num_hits * (num_hits-1) / 2
+    return(mtchs)
+  }))
+  
+  # Calculate number of matches in our vectors set
+  R <- sum(matches)
+  
+  # Generate matrix of HyI values (Vector-Vector relationship)
+  HyI_res <- matrix(0,ncol = nrow(vectors), nrow = nrow(vectors))
+  rownames(HyI_res) <- rownames(vectors)
+  colnames(HyI_res) <- rownames(vectors)
+  
+  # Prepare all possible combinations (non-directional with repetitions)
+  comb_indexes <- expand.grid(seq_along(vectors[,1]),seq_along(vectors[,1])) 
+  comb_indexes <- comb_indexes[comb_indexes[,1] <= comb_indexes[,2],]
+  
+  # Calculate HyI values and store
+  invisible(apply(comb_indexes,1,function(indx){
+    # Unnecessary variable (but it's here to help code reader)
+    i <- indx[[1]]
+    j <- indx[[2]]
+    # Check if it's diagonal (itself)
+    if(i == j){
+      HyI_res[i,j] <<- 1
+    }else{
+      # Obtain number of matches
+      hitsA <- which(vectors[i,] == 1)
+      hitsB <- which(vectors[j,] == 1)
+      x <- length(which(hitsA %in% hitsB))
+      # Calculate HyI value
+      HyI <- phyper(x,R,N-R,n,lower.tail = F)
+      # Store values
+      HyI_res[i,j] <<- HyI
+      HyI_res[j,i] <<- HyI
+    }
+  }))
+  
+  return(HyI_res)
+}
+
+
+
+# Generates a binary {0,1} connectivity matrix from a two-column
+# dataframe given. If same_elements is TRUE both columns are used
+# to find elements and a squared matrix. In other cases, first
+# column elements are used as rows and second column elements are
+# used as columns.
+# @param dataset: data frame of, at least, two columns with elements
+#        connections as tuples
+# @param same_elements: logical flag to know if column 1 and 2 have 
+#        different elements
+# @return a binnary connectivity matrix
+# @author Guillermo Lopez Garcia <guilopgar@uma.com>
+# @author Fernando Moreno Jabato <jabato@uma.com>
+binary_connectivity_matrix <- function(dataset,same_elements=F){  
+  # Take elements
+  if(same_elements){
+    row_elements <- unique(as.character(dataset[,1]),as.character(dataset[,2]))
+    col_elements <- row_elements
+  }else{
+    row_elements <- unique(as.character(dataset[,1]))
+    col_elements <- unique(as.character(dataset[,2]))
+  }
+  
+  # Instantiate connectivity matrix
+  conn_m <- matrix(0, nrow = length(row_elements), ncol = length(col_elements))
+  
+  # Add names
+  rownames(conn_m) <- row_elements
+  colnames(conn_m) <- col_elements
+  
+  # Take tuples and store connection
+  invisible(lapply(seq_along(row_elements),function(i){
+    # Find which col_elements are related
+    related <- dataset[which(dataset[,1] == row_elements[i]),2]
+    # Find matrtix j coords
+    j <- which(col_elements %in% related)
+    # Update values
+    conn_m[i,j] <<- 1
+  }))
+  
+  # Return generated matrix
+  return(conn_m)
+}
+
+
+# Given a pull of same size numeric vectors as a matrix, this function computes
+# the cosine similarity on each possible pair of vectors generating a
+# matrix of vector-vector comparisons (kernel).
+# @param vectors: to be compared, stored as a numeric matrix
+# @param rows: boolean value that indicates how vectors are stored into 
+#        matrix. If row == TRUE, rows are used as vectors, else columns are 
+#        used as vectors
+# @return a squared symmetric matrix with cosine similarity results per all
+#         possible vector comparisons
+# @author Guillermo Lopez Garcia <guilopgar@uma.com>
+# @author Fernando Moreno Jabato <jabato@uma.com>
+cos_similarity_vectors <- function(vectors, rows = T) {
+  # Always use rows as vectors
+  if(!rows) vectors <- t(vectors)
+  
+  # Initialize the returned matrix
+  cos_res <- matrix(1, nrow = nrow(vectors), ncol = nrow(vectors), 
+                    dimnames = list(rownames(vectors), rownames(vectors)))
+  
+  # Compute the cosine similarity value on each pair of vectors
+  if(nrow(cos_res) > 1) {
+    index <- which(lower.tri(cos_res), arr.ind = TRUE)
+    invisible(apply(index, 1, function(x) {
+      i <- x[[1]]
+      j <- x[[2]]
+      cos_sim <- sum(vectors[i, ] * vectors[j, ]) / 
+                      sqrt(sum(vectors[i, ]^2) * sum(vectors[j, ]^2))
+      cos_res[i, j] <<- cos_sim
+      cos_res[j, i] <<- cos_sim
+    }))
+  }
+      
+  return(cos_res)
+}
