@@ -7,3 +7,4 @@ This folder is used to store useful scripts for different purposes. Coded script
 + **network_calculator.R:** script to calculates weighted networks using different methods.
 + **merge_to_triplets.R:** simple script to merge ChEMBL and PFAM tables into a triplets Drug, Domain, Protein.
 + **network_to_clusters.R:** script to calculates clusters from a given network already calculated.
++ **funsys_fili.R:** an ad oc solution to perfomr GO and KEGG enrichment for cluster sets calculated.
